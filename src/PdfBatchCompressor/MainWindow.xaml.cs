@@ -35,7 +35,11 @@ public partial class MainWindow : Window
     }
 
     // -----------------------------------------------------------------------
-    // Fields
+    // Constants
+    // -----------------------------------------------------------------------
+    private const string CompressedSuffix = "_compressed";
+    private const int MaxUniqueNameAttempts = 100_000;
+
     // -----------------------------------------------------------------------
     private readonly ObservableCollection<PdfItem> _itens = [];
     private CancellationTokenSource? _cts;
@@ -264,7 +268,7 @@ public partial class MainWindow : Window
                 {
                     if (token.IsCancellationRequested) break;
 
-                    var nomeBase = Path.GetFileNameWithoutExtension(item.NomeArquivo) + "_compressed.pdf";
+                    var nomeBase = Path.GetFileNameWithoutExtension(item.NomeArquivo) + CompressedSuffix + ".pdf";
                     var saida = GerarCaminhoUnico(destino, nomeBase);
 
                     AppendLog($"Processando: {item.NomeArquivo} ...");
@@ -399,7 +403,7 @@ public partial class MainWindow : Window
         var semExt = Path.GetFileNameWithoutExtension(nomeArquivo);
         var ext = Path.GetExtension(nomeArquivo);
 
-        for (int i = 2; i < 100_000; i++)
+        for (int i = 2; i < MaxUniqueNameAttempts; i++)
         {
             var candidato = Path.Combine(pasta, $"{semExt} ({i}){ext}");
             if (!File.Exists(candidato)) return candidato;
