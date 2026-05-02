@@ -1,0 +1,164 @@
+<Window x:Class="PdfBatchCompressor.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        Title="Compressor de PDF em Lote" Height="700" Width="900"
+        MinHeight="600" MinWidth="750"
+        WindowStartupLocation="CenterScreen">
+
+    <Window.Resources>
+        <Style TargetType="Button">
+            <Setter Property="Padding" Value="10,5"/>
+            <Setter Property="Margin" Value="4,2"/>
+            <Setter Property="MinWidth" Value="110"/>
+        </Style>
+        <Style TargetType="GroupBox">
+            <Setter Property="Margin" Value="5,4"/>
+            <Setter Property="Padding" Value="6,4"/>
+        </Style>
+        <Style TargetType="Label">
+            <Setter Property="VerticalAlignment" Value="Center"/>
+        </Style>
+    </Window.Resources>
+
+    <Grid Margin="10">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="160"/>
+            <RowDefinition Height="Auto"/>
+        </Grid.RowDefinitions>
+
+        <!-- Pasta Origem -->
+        <GroupBox Grid.Row="0" Header="Pasta de Origem">
+            <Grid>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="Auto"/>
+                </Grid.ColumnDefinitions>
+                <TextBox x:Name="TxtOrigem" Grid.Column="0" IsReadOnly="True"
+                         VerticalAlignment="Center" Padding="4,3"
+                         Text="(nenhuma pasta selecionada)"/>
+                <Button x:Name="BtnEscolherOrigem" Grid.Column="1"
+                        Content="Selecionar…" Click="BtnEscolherOrigem_Click"/>
+            </Grid>
+        </GroupBox>
+
+        <!-- Pasta Destino -->
+        <GroupBox Grid.Row="1" Header="Pasta de Destino">
+            <Grid>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="Auto"/>
+                </Grid.ColumnDefinitions>
+                <TextBox x:Name="TxtDestino" Grid.Column="0" IsReadOnly="True"
+                         VerticalAlignment="Center" Padding="4,3"
+                         Text="(nenhuma pasta selecionada)"/>
+                <Button x:Name="BtnEscolherDestino" Grid.Column="1"
+                        Content="Selecionar…" Click="BtnEscolherDestino_Click"/>
+            </Grid>
+        </GroupBox>
+
+        <!-- Lista de PDFs -->
+        <GroupBox Grid.Row="2" Header="PDFs Encontrados">
+            <Grid>
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="*"/>
+                </Grid.RowDefinitions>
+
+                <!-- Toolbar da lista -->
+                <StackPanel Grid.Row="0" Orientation="Horizontal" Margin="0,0,0,4">
+                    <Button x:Name="BtnMarcarTodos" Content="Marcar todos"
+                            Click="BtnMarcarTodos_Click"/>
+                    <Button x:Name="BtnDesmarcarTodos" Content="Desmarcar todos"
+                            Click="BtnDesmarcarTodos_Click"/>
+                    <TextBlock x:Name="TxtContagem" VerticalAlignment="Center"
+                               Margin="10,0,0,0" Foreground="Gray"
+                               Text="Nenhum PDF encontrado."/>
+                </StackPanel>
+
+                <!-- CheckedListBox emulado com ListView -->
+                <ListView x:Name="ListaPdfs" Grid.Row="1"
+                          SelectionMode="Extended"
+                          BorderThickness="1" BorderBrush="#CCCCCC">
+                    <ListView.View>
+                        <GridView>
+                            <GridViewColumn Width="34">
+                                <GridViewColumn.CellTemplate>
+                                    <DataTemplate>
+                                        <CheckBox IsChecked="{Binding Selecionado, Mode=TwoWay}"
+                                                  Checked="CheckBox_CheckChanged"
+                                                  Unchecked="CheckBox_CheckChanged"
+                                                  HorizontalAlignment="Center"/>
+                                    </DataTemplate>
+                                </GridViewColumn.CellTemplate>
+                                <GridViewColumn.Header>
+                                    <CheckBox x:Name="ChkTodos" ToolTip="Marcar/desmarcar todos"
+                                              Checked="ChkTodos_Checked" Unchecked="ChkTodos_Unchecked"/>
+                                </GridViewColumn.Header>
+                            </GridViewColumn>
+                            <GridViewColumn Header="Arquivo" Width="300"
+                                            DisplayMemberBinding="{Binding NomeArquivo}"/>
+                            <GridViewColumn Header="Tamanho" Width="100"
+                                            DisplayMemberBinding="{Binding TamanhoFormatado}"/>
+                            <GridViewColumn Header="Caminho completo" Width="380"
+                                            DisplayMemberBinding="{Binding CaminhoCompleto}"/>
+                        </GridView>
+                    </ListView.View>
+                </ListView>
+            </Grid>
+        </GroupBox>
+
+        <!-- Qualidade + Botões de ação -->
+        <GroupBox Grid.Row="3" Header="Opções e Ações">
+            <Grid>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="Auto"/>
+                    <ColumnDefinition Width="Auto"/>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="Auto"/>
+                    <ColumnDefinition Width="Auto"/>
+                </Grid.ColumnDefinitions>
+
+                <Label Grid.Column="0" Content="Qualidade:"/>
+                <ComboBox x:Name="CmbQualidade" Grid.Column="1"
+                          VerticalAlignment="Center" MinWidth="200"
+                          Margin="4,2"/>
+
+                <StackPanel Grid.Column="3" Orientation="Horizontal">
+                    <Button x:Name="BtnComprimir" Content="Comprimir selecionados"
+                            Background="#2196F3" Foreground="White" FontWeight="SemiBold"
+                            Click="BtnComprimir_Click"/>
+                    <Button x:Name="BtnCancelar" Content="Cancelar"
+                            Background="#f44336" Foreground="White" FontWeight="SemiBold"
+                            IsEnabled="False" Click="BtnCancelar_Click"/>
+                </StackPanel>
+            </Grid>
+        </GroupBox>
+
+        <!-- Log -->
+        <GroupBox Grid.Row="4" Header="Log / Resultado">
+            <TextBox x:Name="TxtLog"
+                     IsReadOnly="True" VerticalScrollBarVisibility="Auto"
+                     HorizontalScrollBarVisibility="Auto"
+                     FontFamily="Consolas" FontSize="12"
+                     TextWrapping="NoWrap"
+                     AcceptsReturn="True"/>
+        </GroupBox>
+
+        <!-- Barra de progresso + status -->
+        <Grid Grid.Row="5" Margin="0,4,0,0">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="Auto"/>
+            </Grid.RowDefinitions>
+            <ProgressBar x:Name="BarraProgresso" Grid.Row="0"
+                         Height="18" Minimum="0" Value="0"/>
+            <TextBlock x:Name="TxtStatus" Grid.Row="1"
+                       Margin="2,2,0,0" Foreground="Gray"
+                       Text="Pronto."/>
+        </Grid>
+    </Grid>
+</Window>

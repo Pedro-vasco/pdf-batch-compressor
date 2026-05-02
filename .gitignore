@@ -1,0 +1,51 @@
+## Visual Studio / .NET gitignore
+
+# Build results
+[Dd]ebug/
+[Rr]elease/
+x64/
+x86/
+[Ww][Ii][Nn]32/
+[Aa][Rr][Mm]/
+[Aa][Rr][Mm]64/
+bld/
+[Bb]in/
+[Oo]bj/
+[Ll]og/
+[Ll]ogs/
+
+# Visual Studio files
+.vs/
+*.user
+*.suo
+*.userosscache
+*.sln.docstates
+*.vcxproj.filters
+
+# NuGet
+*.nupkg
+*.snupkg
+.nuget/
+packages/
+!**/packages/repositories.config
+*.nuspec
+
+# Publish output
+[Pp]ublish/
+PublishProfiles/
+
+# Rider
+.idea/
+
+# OS generated files
+.DS_Store
+Thumbs.db
+
+# test results
+[Tt]est[Rr]esult*/
+[Bb]uild[Ll]og.*
+
+# Ghostscript binaries (user must supply their own; see README)
+tools/gs/*.exe
+tools/gs/*.dll
+tools/gs/lib/

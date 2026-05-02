@@ -1,0 +1,60 @@
+name: Build & Publish
+
+on:
+  push:
+    branches: [ "main", "master", "copilot/**" ]
+  pull_request:
+    branches: [ "main", "master" ]
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: windows-latest
+    permissions:
+      contents: read
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup .NET 8
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: '8.0.x'
+
+      - name: Restore dependencies
+        run: dotnet restore PdfBatchCompressor.sln
+
+      - name: Build (Debug)
+        run: dotnet build PdfBatchCompressor.sln --no-restore -c Debug
+
+      - name: Publish (win-x64, self-contained)
+        run: >
+          dotnet publish src/PdfBatchCompressor/PdfBatchCompressor.csproj
+          -c Release
+          -r win-x64
+          --self-contained true
+          -p:PublishSingleFile=false
+          -o publish/PdfBatchCompressor
+
+      - name: Copy Ghostscript placeholder
+        shell: pwsh
+        run: |
+          $gsDir = "publish\PdfBatchCompressor\tools\gs"
+          New-Item -ItemType Directory -Force -Path $gsDir | Out-Null
+          $readme = @"
+          Coloque aqui os arquivos do Ghostscript (win64):
+            - gswin64c.exe
+            - gsdll64.dll
+            - pasta lib\
+
+          Veja o README principal para instruções detalhadas.
+          "@
+          Set-Content -Path "$gsDir\LEIA-ME.txt" -Value $readme
+
+      - name: Upload artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: PdfBatchCompressor-win-x64
+          path: publish/PdfBatchCompressor/
+          if-no-files-found: error
