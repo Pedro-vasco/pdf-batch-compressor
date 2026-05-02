@@ -51,7 +51,7 @@ tools/
 ## Como compilar (Visual Studio)
 
 1. Abra o Visual Studio 2022 (ou mais recente).
-2. **Abrir Projeto** → selecione `src/PdfBatchCompressor/PdfBatchCompressor.csproj`.
+2. **Arquivo → Abrir → Projeto/Solução** → selecione o arquivo **`PdfBatchCompressor.sln`** na raiz do repositório.
 3. Pressione **F5** para compilar e executar em modo Debug.
 
 ### Como publicar (linha de comando)
@@ -127,5 +127,6 @@ pdf-batch-compressor/
 │   └── gs/                    ← coloque o Ghostscript aqui (não versionado)
 │       └── .gitkeep
 ├── .gitignore
+├── PdfBatchCompressor.sln     ← abra este arquivo no Visual Studio
 └── README.md
 ```
